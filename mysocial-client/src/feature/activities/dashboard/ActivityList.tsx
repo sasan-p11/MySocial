@@ -35,7 +35,7 @@ export default function ActivityList({
                             </Item.Extra>
                         </Item.Content>
                     </Item>
-                ))};
+                ))}
             </Item.Group>
         </Segment>
     );
