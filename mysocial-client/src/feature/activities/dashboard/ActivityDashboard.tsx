@@ -15,6 +15,7 @@ interface Prop {
     handelEditOrCreateActivity: (activity: Activity) => void;
     handelDeleteFromList: (id: string) => void;
     HandelCancelActivity: () => void;
+    submitting : boolean;
 }
 
 export default function ActivityDashboard({
@@ -22,7 +23,8 @@ export default function ActivityDashboard({
     handelCancelActivity, handelSelectActivity,
     editMode, handelFormClose,
     handelFormOpen, handelEditOrCreateActivity,
-    handelDeleteFromList, HandelCancelActivity
+    handelDeleteFromList, HandelCancelActivity,
+    submitting
 }: Prop) {
     return (
         <Grid>
@@ -33,6 +35,7 @@ export default function ActivityDashboard({
                     handelFormClose={handelFormClose}
                     handelDeleteFromList={handelDeleteFromList}
                     HandelCancelActivity={HandelCancelActivity}
+                    submitting={submitting}
                 />
             </GridColumn>
             <GridColumn width='6'>
@@ -47,6 +50,7 @@ export default function ActivityDashboard({
                         activity={selectActivity}
                         handelFormClose={handelFormClose}
                         handelEditOrCreateActivity={handelEditOrCreateActivity}
+                        submitting={submitting}
                     />}
             </GridColumn>
         </Grid>

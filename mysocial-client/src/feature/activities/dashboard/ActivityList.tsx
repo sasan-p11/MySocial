@@ -1,4 +1,4 @@
-import React from "react";
+import  { useState } from "react";
 import { Button, Label, Segment } from "semantic-ui-react";
 import Item from "semantic-ui-react/dist/commonjs/views/Item";
 import { Activity } from "../../../app/models/activity";
@@ -9,13 +9,24 @@ interface Props {
     handelFormClose: () => void;
     handelDeleteFromList: (id: string) => void
     HandelCancelActivity: () => void;
+    submitting: boolean;
 }
 
 export default function ActivityList({
     activities, handelActivitySelected,
     handelFormClose, handelDeleteFromList,
-    HandelCancelActivity
+    HandelCancelActivity, submitting
 }: Props) {
+
+    const[target , setTarget] = useState('');
+
+    function HandelActivityDelete(e: any, id : string){
+        setTarget(e.target.name);
+        handelDeleteFromList(id);
+        HandelCancelActivity();
+        handelFormClose();
+    }
+
     return (
         <Segment>
             <Item.Group divided>
@@ -30,7 +41,11 @@ export default function ActivityList({
                             </Item.Description>
                             <Item.Extra>
                                 <Button onClick={() => { handelActivitySelected(activity.id); handelFormClose() }} floated='right' content='View' color='blue' />
-                                <Button onClick={() => { handelDeleteFromList(activity.id); HandelCancelActivity(); handelFormClose() }} floated='right' content='Delete' color='red' />
+                                <Button 
+                                name={activity.id}
+                                loading={submitting && target === activity.id}
+                                onClick={(e) => { HandelActivityDelete(e,activity.id)}} 
+                                floated='right' content='Delete' color='red' />
                                 <Label basic content={activity.category} />
                             </Item.Extra>
                         </Item.Content>

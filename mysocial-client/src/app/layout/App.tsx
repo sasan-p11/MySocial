@@ -11,13 +11,15 @@ function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [selectedActivity, setSelectActivity] = useState<Activity | undefined>(undefined);
   const [editMode, setEditMode] = useState(false);
-  const [loading , setloading] = useState(true);
+  const [loading, setloading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
   useEffect(() => {
     agent.Activities.list().then((response) => {
       let activities: Activity[] = [];
-       response.forEach(activity => {
-          activity.date = activity.date.split('T')[0];
-          activities.push(activity);
+      response.forEach(activity => {
+        activity.date = activity.date.split('T')[0];
+        activities.push(activity);
       });
       setActivities(activities);
       setloading(false);
@@ -38,16 +40,34 @@ function App() {
     setEditMode(false);
   }
   function handelEditOrCreateActivity(activity: Activity) {
-    activity.id ? setActivities([...activities.filter(x => x.id !== activity.id), activity])
-      : setActivities([...activities, { ...activity, id: uuid() }]);
-    setEditMode(false);
-    setSelectActivity(activity);
+    setSubmitting(true);
+    if (activity.id) {
+      agent.Activities.update(activity).then(() => {
+        setActivities([...activities.filter(x => x.id !== activity.id), activity])
+        setEditMode(false);
+        setSelectActivity(activity);
+        setSubmitting(false);
+      });
+    } else {
+      activity.id = uuid();
+      agent.Activities.create(activity).then(() => {
+        setActivities([...activities, activity]);
+        setEditMode(false);
+        setSelectActivity(activity);
+        setSubmitting(false);
+      });
+    }
   }
   function handelDeleteFromList(id: string) {
-    setActivities([...activities.filter(x => x.id !== id)]);
+    setSubmitting(true);
+    agent.Activities.delete(id).then(()=>{
+      setActivities([...activities.filter(x => x.id !== id)]);
+      setloading(false);
+      setSubmitting(false);
+    });
   }
 
-  if(loading) return <LoadingComponent content='Loading app'/>;
+  if (loading) return <LoadingComponent content='Loading app' />;
 
   return (
     <Fragment>
@@ -66,6 +86,7 @@ function App() {
           handelEditOrCreateActivity={handelEditOrCreateActivity}
           handelDeleteFromList={handelDeleteFromList}
           HandelCancelActivity={HandelCancelActivity}
+          submitting={submitting}
         />
       </Container>
     </Fragment>
